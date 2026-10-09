@@ -1,0 +1,36 @@
+# Default (safe) profile: the GUI, building, pcap import/export and fuzzing.
+# No special privileges, works identically on Windows / macOS / Linux.
+#
+#   docker compose up --build
+#   open http://localhost:8089
+#
+# To ALSO transmit frames on a real interface (Linux host only, authorized
+# testing only), use the "live" profile which adds NET_RAW + host networking:
+#
+#   docker compose --profile live up --build
+services:
+  packetblocks:
+    build: .
+    image: packetblocks:latest
+    ports:
+      - "8089:8089"
+    volumes:
+      # Drop your captured .pcap files here and import them from the UI.
+      - ./samples:/app/samples
+    restart: unless-stopped
+
+  # Opt-in packet sending. Linux host only (host networking + NET_RAW are not
+  # available on Docker Desktop for Windows/macOS). Use only on networks you own.
+  packetblocks-live:
+    profiles: ["live"]
+    build: .
+    image: packetblocks:latest
+    network_mode: host
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    environment:
+      - PACKETBLOCKS_ALLOW_SEND=1
+    volumes:
+      - ./samples:/app/samples
+    restart: unless-stopped

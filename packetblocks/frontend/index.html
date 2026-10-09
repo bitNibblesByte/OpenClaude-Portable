@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PacketBlocks — visual packet crafting &amp; fuzzing</title>
+<link rel="stylesheet" href="css/style.css" />
+<script src="vendor/blockly/blockly_compressed.js"></script>
+<script src="vendor/blockly/blocks_compressed.js"></script>
+<script src="vendor/blockly/msg/en.js"></script>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="logo">🧩</span>
+    <div>
+      <h1>PacketBlocks</h1>
+      <p class="tag">Snap network packets together, import captures, and fuzz them — visually.</p>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button id="btn-build" class="primary">▶ Build packet</button>
+    <label class="filebtn">⬆ Import pcap
+      <input type="file" id="pcap-input" accept=".pcap,.pcapng,.cap" hidden />
+    </label>
+    <button id="btn-export">⬇ Export pcap</button>
+    <button id="btn-fuzz" class="accent">🎲 Fuzz…</button>
+    <button id="btn-send" class="danger" title="Disabled unless the container allows sending">📡 Send</button>
+  </div>
+</header>
+
+<main>
+  <section id="workspace-pane">
+    <div id="blockly-div"></div>
+  </section>
+
+  <aside id="inspector">
+    <div class="panel">
+      <h2>Packet bytes</h2>
+      <div id="summary" class="summary">Build a packet to see it here.</div>
+      <pre id="hexdump" class="hexdump"></pre>
+      <div id="layers" class="layers"></div>
+    </div>
+
+    <div class="panel" id="capture-panel" hidden>
+      <h2>Imported packets <span id="capture-count" class="pill"></span></h2>
+      <p class="hint">Click one to load it into the block canvas.</p>
+      <ul id="capture-list" class="capture-list"></ul>
+    </div>
+
+    <div class="panel" id="fuzz-results-panel" hidden>
+      <h2>Fuzz cases <span id="fuzz-count" class="pill"></span></h2>
+      <p class="hint">Each row is a mutated packet. The changed fields are highlighted.</p>
+      <ul id="fuzz-list" class="fuzz-list"></ul>
+    </div>
+  </aside>
+</main>
+
+<!-- Fuzz configuration modal -->
+<div id="fuzz-modal" class="modal" hidden>
+  <div class="modal-card">
+    <h2>Configure fuzzing</h2>
+    <p class="hint">Pick a layer, a field, and a mutation strategy. Add as many rules
+       as you like — they're applied together to every generated case.</p>
+    <div id="fuzz-rules"></div>
+    <button id="add-rule" class="small">+ Add rule</button>
+    <div class="row">
+      <label># cases <input type="number" id="fuzz-cases" value="20" min="1" max="1000" /></label>
+      <label>seed <input type="number" id="fuzz-seed" placeholder="(random)" /></label>
+    </div>
+    <div class="modal-actions">
+      <button id="fuzz-cancel">Cancel</button>
+      <button id="fuzz-run" class="accent">Generate cases</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/blocks.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
